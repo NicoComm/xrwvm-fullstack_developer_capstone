@@ -2,7 +2,6 @@
 import requests
 import os
 from dotenv import load_dotenv
-from .restapis import get_request, analyze_review_sentiments, post_review
 
 load_dotenv()
 
@@ -18,7 +17,8 @@ def get_request(endpoint, **kwargs):
         for key,value in kwargs.items():
             params=params+key+"="+value+"&"
 
-    request_url = backend_url+endpoint+"?"+params
+    #request_url = backend_url+endpoint+"?"+params
+    request_url = backend_url.rstrip("/") + "/" + endpoint.lstrip("/") + "?" + params
 
     print("GET from {} ".format(request_url))
     try:
@@ -34,7 +34,8 @@ def get_request(endpoint, **kwargs):
 # request_url = sentiment_analyzer_url+"analyze/"+text
 # Add code for retrieving sentiments
 def analyze_review_sentiments(text):
-    request_url = sentiment_analyzer_url+"analyze/"+text
+    
+    request_url = sentiment_analyzer_url.rstrip("/") + "/analyze/" + text
     try:
         # Call get method of requests library with URL and parameters
         response = requests.get(request_url)
@@ -47,10 +48,29 @@ def analyze_review_sentiments(text):
 
 # Add code for posting review
 def post_review(data_dict):
-    request_url = backend_url+"/insert_review"
+    request_url = backend_url.rstrip("/") + "/insert_review"
+
+    try:
+        response = requests.post(request_url, json=data_dict)
+
+        print("Status:", response.status_code)
+        print("Response:", response.text)
+
+        response.raise_for_status()
+
+        return response.json()
+
+    except Exception as err:
+        print("POST review error:", err)
+        return None
+'''
+def post_review(data_dict):
+    #request_url = backend_url+"/insert_review"
+    request_url = backend_url.rstrip("/") + "/insert_review"
     try:
         response = requests.post(request_url,json=data_dict)
         print(response.json())
         return response.json()
     except:
         print("Network exception occurred")
+'''

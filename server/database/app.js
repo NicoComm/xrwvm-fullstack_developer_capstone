@@ -7,6 +7,7 @@ const port = 3030;
 
 app.use(cors())
 app.use(require('body-parser').urlencoded({ extended: false }));
+app.use(express.json());
 
 const reviews_data = JSON.parse(fs.readFileSync("reviews.json", 'utf8'));
 const dealerships_data = JSON.parse(fs.readFileSync("dealerships.json", 'utf8'));
@@ -77,9 +78,10 @@ app.get('/fetchDealers/:state', async (req, res) => {
 });
 
 // Express route to fetch dealer by a particular id
-app.get('/fetchDealer/:id', async (req, res) => {
+app.get('/fetchDealers/:id', async (req, res) => {
   try{
-    const documents = await Dealerships.find({id: req.params.id})
+    const documents = await Dealerships.find({id:Number(req.params.id)})
+    //const documents = await Dealerships.find({id: req.params.id})
     res.json(documents)
   }catch(error){
     res.status(500).json({error: 'Error fetching documents'});
@@ -87,8 +89,43 @@ app.get('/fetchDealer/:id', async (req, res) => {
 });
 
 //Express route to insert review
-app.post('/insert_review', express.raw({ type: '*/*' }), async (req, res) => {
-  data = JSON.parse(req.body);
+app.post('/insert_review', async (req, res) => {
+    const data = req.body;
+
+    const documents = await Reviews.find().sort({id:-1});
+
+    let new_id = documents[0]['id'] + 1;
+
+    const review = new Reviews({
+        id: new_id,
+        name: data.name,
+        dealership: data.dealership,
+        review: data.review,
+        purchase: data.purchase,
+        purchase_date: data.purchase_date,
+        car_make: data.car_make,
+        car_model: data.car_model,
+        car_year: data.car_year,
+    });
+
+    try {
+        const savedReview = await review.save();
+        res.json(savedReview);
+    } catch(error) {
+        console.log(error);
+        res.status(500).json({
+            error:'Error inserting review'
+        });
+    }
+});
+
+app.listen(port, () => {
+    console.log(`Server is running on http://localhost:${port}`);
+  });
+  
+
+//app.post('/insert_review', express.raw({ type: '*/*' }), async (req, res) => {
+/*  data = JSON.parse(req.body);
   const documents = await Reviews.find().sort( { id: -1 } )
   let new_id = documents[0]['id']+1
 
@@ -112,8 +149,5 @@ app.post('/insert_review', express.raw({ type: '*/*' }), async (req, res) => {
     res.status(500).json({ error: 'Error inserting review' });
   }
 });
-
+*/
 // Start the Express server
-app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
-});
