@@ -1,8 +1,17 @@
-{ "esversion": 8, 
-  "node": true, "browser": 
-  true, "undef": true, 
-  "unused": false, 
-  "semi": false, 
-  "quotmark": false, 
-  "sub": false
+{
+  "esversion": 8,
+  "node": true,
+  "browser": true,
+  "undef": false,
+  "unused": false,
+  "asi": true,
+  "sub": true,
+  "latedef": false,
+  "globals": {
+    "require": true,
+    "module": true,
+    "exports": true,
+    "console": true,
+    "process": true
+  }
 }
