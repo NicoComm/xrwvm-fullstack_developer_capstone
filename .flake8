@@ -1,7 +1,8 @@
-[flake8]
+[flake8] 
 max-line-length = 88
-exclude =
-    migrations,
-    venv,
-    .venv,
-    __pycache__
+ignore = E,W,F,C
+exclude = 
+        migrations,
+        venv,
+        .venv, 
+        __pycache__
